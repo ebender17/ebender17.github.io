@@ -1,0 +1,56 @@
+{
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "json",
+    "jsonc",
+    "json5",
+    "html"
+  ],
+  "html-validate.validate": [
+    "html",
+    "vue",
+    "vue-html"
+  ],
+  "files.eol": "\n",
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "css.lint.validProperties": [
+    "alignment-baseline",
+    "dominant-baseline",
+    "vector-effect"
+  ],
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+  "javascript.preferences.importModuleSpecifier": "relative",
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "eslint.format.enable": true,
+  "eslint.lintTask.enable": true,
+  "[javascript][json][jsonc][typescript]": {
+    "editor.codeActionsOnSave": {
+      "source.addMissingImports": "explicit",
+      "source.organizeImports": "never",
+      "source.fixAll.eslint": "explicit"
+    },
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[json][jsonc]": {
+    "files.insertFinalNewline": false,
+    "files.trimTrailingWhitespace": true
+  },
+  "[css][scss]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit",
+      "source.fixAll.stylelint": "explicit"
+    },
+    "editor.defaultFormatter": "stylelint.vscode-stylelint"
+  },
+  "[bat]": {
+    "files.eol": "\r\n"
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "module": "ES2022",
+    "target": "ES2022",
+    "noEmit": true,
+    "allowJs": true,
+    "checkJs": true,
+    "moduleResolution": "bundler",
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": false,
+    "exactOptionalPropertyTypes": true,
+    "isolatedModules": true,
+    "useDefineForClassFields": true,
+    "baseUrl": ".",
+    "types": [
+      "node"
+    ],
+    "paths": {}
+  },
+  "exclude": [
+    "node_modules",
+    "temp"
+  ],
+  "include": [
+    "*.js",
+    "*.mjs",
+    "*.*.mjs",
+    "*.ts",
+    "src/ts"
+  ]
+}
