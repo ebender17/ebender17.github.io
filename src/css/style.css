@@ -17,6 +17,10 @@
 
   --text-color: #000;
 
+  --input-background-color: #0006;
+  --input-hover-color: #0003;
+  --input-active-color: #0006;
+
   height: 100%;
   font-family: Roboto, Arial, sans-serif;
   font-size: calc(1px * var(--font-size));
@@ -32,6 +36,41 @@ body {
   overflow: hidden;
   color: var(--text-color);
   background-color: var(--background-color);
+  scroll-behavior: smooth;
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+}
+
+/* Icons */
+.icon {
+  --icon-size: contain;
+
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center center;
+  -webkit-mask-mode: alpha;
+  -webkit-mask-size: var(--icon-size);
+  -webkit-mask-image: none;
+  mask-repeat: no-repeat;
+  mask-position: center center;
+  mask-mode: alpha;
+  mask-size: var(--icon-size);
+  mask-image: none;
+}
+.icon[data-icon=home] {
+  -webkit-mask-image: url(../images/icons/home.svg);
+  mask-image: url(../images/icons/home.svg);
+}
+.icon[data-icon=about-me] {
+  -webkit-mask-image: url(../images/icons/about-me.svg);
+  mask-image: url(../images/icons/about-me.svg);
+}
+.icon[data-icon=portfolio] {
+  -webkit-mask-image: url(../images/icons/portfolio.svg);
+  mask-image: url(../images/icons/portfolio.svg);
+}
+.icon[data-icon=link] {
+  -webkit-mask-image: url(../images/icons/link.svg);
+  mask-image: url(../images/icons/link.svg);
 }
 
 /* Canvas layout */
@@ -54,4 +93,103 @@ body {
   -webkit-user-select: none;
   user-select: none;
   outline: none;
+}
+
+/* Sections */
+.section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: start;
+  position: relative;
+}
+.section-inner {
+  width: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+}
+
+/* Controls */
+.controls {
+  position: fixed;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 40;
+  box-sizing: border-box;
+}
+.controls-inner {
+  flex: 0 0 auto;
+  display: flex;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  background-color: var(--input-background-color);
+  border: 0.25em solid #0000;
+  border-radius: 2em;
+  pointer-events: all;
+}
+.controls-button {
+  background-color: transparent;
+  padding: 0;
+  box-sizing: border-box;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  border: none;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+  outline: none;
+  box-shadow: none;
+}
+.controls-button-inner {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 3em;
+  height: 3em;
+}
+.controls-button-background {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 2em;
+  outline-offset: 0;
+  transition: background-color var(--transition-duration-short) linear;
+}
+.controls-button:hover .controls-button-background,
+.controls-button[data-selected] .controls-button-background {
+  background-color: var(--input-hover-color);
+}
+.controls-button:active .controls-button-background {
+  background-color: var(--input-active-color);
+}
+.controls-button:focus-visible .controls-button-background {
+  outline: 0.125em solid #fff;
+}
+.controls-button-icon-container {
+  position: relative;
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr;
+  place-items: center center;
+}
+.controls-button-icon {
+  grid-column: 1;
+  grid-row: 1;
+  display: block;
+  width: 2em;
+  height: 2em;
+  background-color: #fff;
 }

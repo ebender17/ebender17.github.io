@@ -33,6 +33,7 @@ export class SceneController {
   private createScene(): void {
     const camera = new ArcRotateCamera('camera', Math.PI / 2, Math.PI / 3, 6, new Vector3(0, 1, 0), this.scene);
     camera.attachControl(this.canvas, true);
+    camera.inputs.removeByType('ArcRotateCameraMouseWheelInput');
 
     new HemisphericLight('light', new Vector3(0, 1, 0), this.scene);
 
