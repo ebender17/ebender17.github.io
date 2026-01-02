@@ -36,9 +36,9 @@ body {
   overflow: hidden;
   color: var(--text-color);
   background-color: var(--background-color);
-  scroll-behavior: smooth;
   overflow-y: scroll;
-  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  scroll-snap-type: y proximity;
 }
 
 /* Icons */
@@ -110,6 +110,17 @@ body {
   flex-flow: column nowrap;
   justify-content: flex-start;
   align-items: stretch;
+}
+
+/* TODO : Remove, for testing */
+#about-me {
+  background-color: #ff0000;
+}
+#projects {
+  background-color: #00ff00;
+}
+#links {
+  background-color: #0000ff;
 }
 
 /* Controls */
