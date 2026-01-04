@@ -21,6 +21,15 @@
   --input-hover-color: #0003;
   --input-active-color: #0006;
 
+  --border-radius: 2em;
+
+  --blue-1: #37a7ed;
+  --blue-2: #2571a1;
+  --blue-3: #1d597f;
+  --blue-4: #15415d;
+
+  --dark-gray: #43403c;
+
   height: 100%;
   font-family: Roboto, Arial, sans-serif;
   font-size: calc(1px * var(--font-size));
@@ -38,7 +47,16 @@ body {
   background-color: var(--background-color);
   overflow-y: scroll;
   scroll-behavior: smooth;
-  scroll-snap-type: y proximity;
+  scroll-snap-type: y mandatory;
+}
+
+h2 {
+  margin: 0;
+  font-size: 2em;
+}
+
+p {
+  margin: 0;
 }
 
 /* Icons */
@@ -97,25 +115,67 @@ body {
 
 /* Sections */
 .section {
-  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   scroll-snap-align: start;
   position: relative;
+  min-height: 100vh;
 }
-.section-inner {
+.section-wrapper-border {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: stretch;
+  align-items: stretch;
+  align-self: stretch;
   width: 100%;
+  border: 1.5px solid var(--dark-gray);
+  border-radius: var(--border-radius);
+  padding: 4em;
+  margin: 4em;
+}
+.section-title {
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-start;
-  align-items: stretch;
+  align-items: flex-start;
+  flex: 0 0 auto;
+}
+.section-content {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: stretch;
+  align-items: center;
+  flex: 1 1 auto;
+  gap: 2em;
+}
+.section-image-border-container {
+  width: 34em;
+  flex: 0 0 auto;
+  background: var(--blue-1);
+  border-radius: 2em;
+}
+.section-image-border-inner {
+  position: relative;
+  left: 0.75em;
+  bottom: 0.625em;
+}
+.section-image-border-inner img {
+  width: 100%;
+  object-fit: contain;
+  border-radius: 2em;
+}
+.section-text-container {
+  display: flex;
+  flex: 1 1 auto;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5em;
+  gap: 1em;
 }
 
 /* TODO : Remove, for testing */
-#about-me {
-  background-color: #ff0000;
-}
 #projects {
   background-color: #00ff00;
 }
@@ -203,4 +263,11 @@ body {
   width: 2em;
   height: 2em;
   background-color: #fff;
+}
+
+/* Misc */
+.underline {
+  background-color: var(--blue-1);
+  width: 4em;
+  height: 0.125em;
 }
