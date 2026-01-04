@@ -4,6 +4,8 @@ import {Vector3} from '@babylonjs/core/Maths/math.vector';
 import {MeshBuilder} from '@babylonjs/core/Meshes/meshBuilder';
 import {Scene} from '@babylonjs/core/scene';
 import type {Application} from './application';
+import '@babylonjs/core/Debug/debugLayer';
+import '@babylonjs/inspector';
 
 export class SceneController {
   private readonly contentResizeObserver = new ResizeObserver(this.onCanvasResize.bind(this));
@@ -22,6 +24,14 @@ export class SceneController {
     this.createScene();
     this.contentResizeObserver.observe(this.canvas, {box: 'border-box'});
     this.engine.runRenderLoop(this.onRenderLoop.bind(this));
+    const urlParameters = new URLSearchParams(window.location.search);
+    const hasDebug = urlParameters.has('debug');
+    if (hasDebug) {
+      this.scene.debugLayer.show({
+        handleResize: true,
+        overlay: true,
+      });
+    }
   }
 
   dispose(): void {
