@@ -120,7 +120,7 @@ p {
   justify-content: center;
   scroll-snap-align: start;
   position: relative;
-  min-height: 100vh;
+  height: 100vh;
 }
 .section-wrapper-border {
   display: flex;
@@ -131,27 +131,25 @@ p {
   width: 100%;
   border: 1.5px solid var(--dark-gray);
   border-radius: var(--border-radius);
-  padding: 4em;
-  margin: 4em;
+  gap: 1em;
+  padding: 2em;
+  margin: 2em;
 }
 .section-title {
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-start;
   align-items: flex-start;
-  flex: 0 0 auto;
 }
 .section-content {
+  height: 100%;
   display: flex;
   flex-flow: row nowrap;
   justify-content: stretch;
   align-items: center;
-  flex: 1 1 auto;
   gap: 2em;
 }
 .section-image-border-container {
-  width: 34em;
-  flex: 0 0 auto;
   background: var(--blue-1);
   border-radius: 2em;
 }
@@ -167,11 +165,10 @@ p {
 }
 .section-text-container {
   display: flex;
-  flex: 1 1 auto;
   flex-flow: column nowrap;
   justify-content: center;
   align-items: center;
-  font-size: 1.5em;
+  font-size: 1em;
   gap: 1em;
 }
 

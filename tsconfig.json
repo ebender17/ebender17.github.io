@@ -13,6 +13,7 @@
     "exactOptionalPropertyTypes": true,
     "isolatedModules": true,
     "useDefineForClassFields": true,
+    "skipLibCheck": true,
     "baseUrl": ".",
     "types": [
       "node"
