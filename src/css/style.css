@@ -273,7 +273,6 @@ a[href]:hover {
 .section-grid {
   display: grid;
   width: 100%;
-  height: 100%;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(2, 1fr);
   gap: 1em;
@@ -324,6 +323,7 @@ a[href]:hover {
   height: 6em;
   background-color: var(--blue-1);
   border-radius: 50%;
+  transition: background-color var(--transition-duration-short) linear;
 }
 .section-link-icon-container:hover {
   background-color: var(--blue-2);
@@ -339,6 +339,20 @@ a[href]:hover {
 .section-link-text {
   font-size: 1.25em;
   text-align: center;
+}
+
+/* Videos */
+.video-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 */
+}
+.video-wrapper iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
 }
 
 /* Controls */
