@@ -1,5 +1,4 @@
 import {EventListenerCollection} from '../common/event-listener-collection';
-import {querySelectorNotNull} from '../dom/query-selectors';
 import {Application} from './application';
 
 type Section = {
@@ -20,13 +19,6 @@ export class UIController {
   }
 
   prepare(): void {
-    const intersectionObserver = new IntersectionObserver(
-      this.onIntersection.bind(this),
-      {
-        threshold: [0.9],
-      },
-    );
-
     const sections = document.querySelectorAll<HTMLElement>('.section');
     const buttons = document.querySelectorAll<HTMLButtonElement>('.controls-button[data-action]');
     if (sections.length !== buttons.length) {
@@ -43,7 +35,6 @@ export class UIController {
       if (element.id !== action) {
         throw Error('Section id and button action do not match');
       }
-      intersectionObserver.observe(element);
       const section: Section = {element, button, action};
       this.eventListeners.addEventListener(button, 'click', this.onButtonClick.bind(this, section));
       this.sections.push(section);
@@ -57,22 +48,8 @@ export class UIController {
     this.eventListeners.clear();
   }
 
-  private onIntersection(entries: IntersectionObserverEntry[], _observer: IntersectionObserver): void {
-    for (const entry of entries) {
-      if (entry.isIntersecting && entry.intersectionRatio > 0.9) {
-        const section = this.actionToSectionMap.get(entry.target.id);
-        if (typeof section === 'undefined') {
-          throw Error(`Could not find section ${entry.target.id} inside map`);
-        }
-        this.setSelectedSection(section);
-      }
-    }
-  }
-
   private onButtonClick(section: Section): void {
     this.setSelectedSection(section);
-    const targetElement = querySelectorNotNull<HTMLElement>(document, `#${section.action}`);
-    targetElement.scrollIntoView({behavior: 'smooth', block: 'start'});
   }
 
   private setSelectedSection(section: Section): void {
