@@ -4,6 +4,7 @@ import {HemisphericLight} from '@babylonjs/core/Lights/hemisphericLight';
 import {Material} from '@babylonjs/core/Materials/material';
 import {RegisterMaterialPlugin} from '@babylonjs/core/Materials/materialPluginManager';
 import {PBRMaterial} from '@babylonjs/core/Materials/PBR/pbrMaterial';
+import {Color3} from '@babylonjs/core/Maths/math.color';
 import {Vector3} from '@babylonjs/core/Maths/math.vector';
 import {Mesh} from '@babylonjs/core/Meshes/mesh';
 import {MeshBuilder} from '@babylonjs/core/Meshes/meshBuilder';
@@ -17,6 +18,14 @@ export class SceneController {
   private readonly contentResizeObserver = new ResizeObserver(this.onCanvasResize.bind(this));
   private readonly engine: Engine;
   private readonly scene: Scene;
+  private readonly glassColors: Color3[] = [
+    Color3.FromHexString('#48D9FA').toLinearSpace(),
+    Color3.FromHexString('#48A1FA').toLinearSpace(),
+    Color3.FromHexString('#48FAE1').toLinearSpace(),
+    Color3.FromHexString('#48FAA4').toLinearSpace(),
+    Color3.FromHexString('#4869FA').toLinearSpace(),
+    Color3.FromHexString('#9CE9FA').toLinearSpace(),
+  ];
 
   constructor(
     public readonly application: Application,
@@ -51,7 +60,7 @@ export class SceneController {
       StainedGlassMaterialPlugin.name,
       (material: Material): StainedGlassMaterialPlugin | null => {
         if (!(material instanceof PBRMaterial)) { return null; }
-        return new StainedGlassMaterialPlugin(material);
+        return new StainedGlassMaterialPlugin(material, Color3.Black(), this.glassColors);
       },
     );
 
@@ -68,11 +77,11 @@ export class SceneController {
     sphere.position.y = 1;
 
     const plane = MeshBuilder.CreatePlane('plane', {sideOrientation: Mesh.DOUBLESIDE}, this.scene);
-    plane.position.x = 1;
-    plane.position.y = 1;
+    plane.position = new Vector3(-0.1, 1, 1);
     const stainedGlassMaterial = new PBRMaterial('stainedGlass', this.scene);
     stainedGlassMaterial.metallic = 0.4;
     stainedGlassMaterial.roughness = 0.5;
+    stainedGlassMaterial.transparencyMode = PBRMaterial.PBRMATERIAL_ALPHATESTANDBLEND;
     plane.material = stainedGlassMaterial;
     const stainedGlassPlugin = stainedGlassMaterial.pluginManager?.getPlugin(StainedGlassMaterialPlugin.name);
     if (stainedGlassPlugin && stainedGlassPlugin instanceof StainedGlassMaterialPlugin) {

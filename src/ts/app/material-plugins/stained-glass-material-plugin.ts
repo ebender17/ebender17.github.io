@@ -1,13 +1,21 @@
-import {MaterialDefines, AbstractMesh, UniformBuffer} from '@babylonjs/core';
+import type {MaterialDefines} from '@babylonjs/core/Materials/materialDefines';
 import {MaterialPluginBase} from '@babylonjs/core/Materials/materialPluginBase';
 import {PBRMaterial} from '@babylonjs/core/Materials/PBR/pbrMaterial';
+import type {UniformBuffer} from '@babylonjs/core/Materials/uniformBuffer';
+import {Color3} from '@babylonjs/core/Maths/math.color';
+import type {AbstractMesh} from '@babylonjs/core/Meshes/abstractMesh';
 import {serialize} from '@babylonjs/core/Misc/decorators';
 import type {Scene} from '@babylonjs/core/scene';
 
 export class StainedGlassMaterialPlugin extends MaterialPluginBase {
   private _isEnabled = false;
+  public tiling = 8;
+  public baseAlpha = 0.75;
+  public borderWidth = 0.05;
+  private readonly borderColor: Color3;
+  private readonly glassColors: Color3[];
 
-  constructor(material: PBRMaterial) {
+  constructor(material: PBRMaterial, borderColor: Color3, glassColors: Color3[]) {
     super(
       material,
       StainedGlassMaterialPlugin.name,
@@ -16,10 +24,17 @@ export class StainedGlassMaterialPlugin extends MaterialPluginBase {
         STAINED_GLASS: false,
       },
     );
+    this.borderColor = borderColor;
+    this.glassColors = [...glassColors];
 
     const addProperty = serialize();
     for (const property of [
       'isEnabled',
+      'tiling',
+      'baseAlpha',
+      'borderWidth',
+      'borderColor',
+      'glassColors',
     ]) {
       addProperty(this, property);
     }
@@ -45,19 +60,41 @@ export class StainedGlassMaterialPlugin extends MaterialPluginBase {
   getUniforms(): ReturnType<MaterialPluginBase['getUniforms']> {
     return {
       ubo: [
+        {name: 'uTiling', size: 1, type: 'float'},
+        {name: 'uBaseAlpha', size: 1, type: 'float'},
+        {name: 'uBorderWidth', size: 1, type: 'float'},
+        {name: 'uBorderColor', size: 3, type: 'vec3'},
+        {name: 'uNumberOfGlassColors', size: 1, type: 'highp int'},
+        {name: 'uGlassColors', size: 3, type: 'vec3', arraySize: this.glassColors.length},
       ],
       fragment: `
 #ifdef STAINED_GLASS
+float uTiling;
+float uBaseAlpha;
+float uBorderWidth;
+vec3 uBorderColor;
+uniform int uNumberOfGlassColors;
+uniform vec3 uGlassColors[${this.glassColors.length}];
 #endif`,
     };
   }
 
   bindForSubMesh(uniformBuffer: UniformBuffer): void {
     if (!this._isEnabled) { return; }
-    // TODO : update uniforms here
+    uniformBuffer.updateFloat('uTiling', this.tiling);
+    uniformBuffer.updateFloat('uBaseAlpha', this.baseAlpha);
+    uniformBuffer.updateFloat('uBorderWidth', this.borderWidth);
+    uniformBuffer.updateColor3('uBorderColor', this.borderColor);
+    const colorsArray = new Float32Array(this.glassColors.length * 3);
+    for (let i = 0; i < this.glassColors.length; i++) {
+      const color = this.glassColors[i];
+      colorsArray.set([color.r, color.g, color.b], i * 3);
+    }
+    uniformBuffer.updateInt('uNumberOfGlassColors', this.glassColors.length);
+    uniformBuffer.updateFloatArray('uGlassColors', colorsArray);
   }
 
-  // TODO : clean comments
+  // TODO : use noise to created frosted glass appearance
   getCustomCode(shaderType: string | null): ReturnType<MaterialPluginBase['getCustomCode']> {
     switch (shaderType) {
       case 'vertex':
@@ -79,38 +116,74 @@ vUV = uv;
 #ifdef STAINED_GLASS
 varying vec2 vUV;
 
+int hash(ivec2 id) {
+  int h = id.x * 374761393 + id.y * 668265263;
+  h = (h ^ (h >> 13)) * 1274126177;
+  return abs(h);
+}
+
 vec2 random2(vec2 p) {
   return fract(sin(vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)))) * 43758.5453);
 }
+
+vec3 voronoi(vec2 position) {
+  vec2 baseCell = floor(position);
+  vec2 localPosition = fract(position);
+
+  vec2 closestNeighbor;
+  vec2 toClosestNeighbor;
+
+  float minSqrDistance = uTiling;
+
+  // Find the closest cell and point in cell
+  for (int y = -1; y <= 1; y++) {
+    for (int x = -1; x <= 1; x++) {
+      // Neighbor place in the grid
+      vec2 neighbor = vec2(x, y);
+      // Random position from current + neighbor place in the grid
+      vec2 point = random2(baseCell + neighbor);
+      // Vector between the pixel and the point
+      vec2 toNeighbor = neighbor + point - localPosition;
+      float sqrDistance = dot(toNeighbor, toNeighbor);
+      if (sqrDistance < minSqrDistance) {
+        minSqrDistance = sqrDistance;
+        toClosestNeighbor = toNeighbor;
+        closestNeighbor = neighbor;
+      }
+    }
+  }
+
+  float minBorderDistance = uTiling;
+  // Search around the cell that contained the closest point to find distance to border
+  for (int y = -2; y <= 2; y++) {
+    for (int x = -2; x <= 2; x++) {
+      vec2 closestNeighborOffset = closestNeighbor + vec2(x, y);
+      vec2 point = random2(baseCell + closestNeighborOffset);
+      vec2 toOtherNeighbor = closestNeighborOffset + point - localPosition;
+      vec2 direction = normalize(toOtherNeighbor - toClosestNeighbor);
+      vec2 midpoint = 0.5 * (toOtherNeighbor + toClosestNeighbor);
+      float borderDistance = dot(midpoint, direction);
+      minBorderDistance = min(minBorderDistance, borderDistance);
+    }
+  }
+  vec2 winningCell = baseCell + closestNeighbor;
+  return vec3(minBorderDistance, winningCell);
+}
 #endif
-          `,
+`,
+          CUSTOM_FRAGMENT_UPDATE_ALPHA: `
+#ifdef STAINED_GLASS
+vec2 uv = vUV * vec2(uTiling);
+vec3 v = voronoi(uv);
+float borderMask = smoothstep(uBorderWidth, 0., v.x);
+alpha = uBaseAlpha + borderMask;
+#endif
+`,
           CUSTOM_FRAGMENT_BEFORE_LIGHTS: `
 #ifdef STAINED_GLASS
-vec3 color = vec3(0.);
-
-// Scale
-vec2 uv = vUV * vec2(3.);
-
-// Tile the space
-vec2 iUV = floor(uv);
-vec2 fUV = fract(uv);
-
-float minDistance = 1.;
-
-for (int y = -1; y <= 1; y++) {
-  for (int x = -1; x <= 1; x++) {
-    // Neighbor place in the grid
-    vec2 neighbor = vec2(float(x), float(y));
-    // Random position from current + neighbor place in the grid
-    vec2 point = random2(iUV + neighbor);
-    // Vector between the pixel and the point
-    vec2 diff = neighbor + point - fUV;
-    float distance = length(diff);
-    minDistance = min(minDistance, distance);
-  }
-}
-color += minDistance;
-surfaceAlbedo = color;
+int index = hash(ivec2(v.yz)) % uNumberOfGlassColors;
+vec3 cellColor = uGlassColors[index];
+surfaceAlbedo = mix(cellColor, uBorderColor, borderMask);
 #endif
 `,
         };
